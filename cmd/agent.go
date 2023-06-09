@@ -1,11 +1,12 @@
 /*
 Copyright © 2023 Josh Whetton <whetton.josh@gmail.com>
-
 */
 package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net/http"
 
 	"github.com/spf13/cobra"
 )
@@ -20,9 +21,7 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("agent called")
-	},
+	Run: getAgent,
 }
 
 func init() {
@@ -37,4 +36,23 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// agentCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+var agentUrl = fmt.Sprintf("%s/my/agent", ApiBaseUrl)
+
+func getAgent(cmd *cobra.Command, args []string) {
+	request, err := http.NewRequest("GET", agentUrl, nil)
+	if err != nil {
+		fmt.Printf("Failed to build request: %v\n", err)
+	}
+	request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", ApiToken))
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		fmt.Printf("Failure when performing the request: %v\n", err)
+	}
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		fmt.Printf("Failed to read response body: %v\n", err)
+	}
+	fmt.Printf("%s\n", body)
 }

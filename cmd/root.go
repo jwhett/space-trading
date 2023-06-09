@@ -9,6 +9,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const ApiBaseUrl = "https://api.spacetraders.io/v2"
+
+var ApiToken = os.Getenv("ST_TOKEN")
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "space-trading",
