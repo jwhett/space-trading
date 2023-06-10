@@ -4,10 +4,12 @@ Copyright © 2023 Josh Whetton <whetton.josh@gmail.com>
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 
+	"github.com/jwhett/space-trading/models"
 	"github.com/spf13/cobra"
 )
 
@@ -54,5 +56,10 @@ func getAgent(cmd *cobra.Command, args []string) {
 	if err != nil {
 		fmt.Printf("Failed to read response body: %v\n", err)
 	}
-	fmt.Printf("%s\n", body)
+	var ad models.AgentData
+	err = json.Unmarshal([]byte(body), &ad)
+	if err != nil {
+		fmt.Printf("Failed to unmarshall body into an Agent: %v\n", err)
+	}
+	fmt.Printf("Name: %s\nFaction: %s\nHQ: %s\nCredits: %d\n", ad.Data.Symbol, ad.Data.StartingFaction, ad.Data.Headquarters, ad.Data.Credits)
 }
